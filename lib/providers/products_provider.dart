@@ -36,9 +36,22 @@ class Products with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
   ];
+// // manage the favorite filter.
+// // this is application wide filter approach.
+// // filter logic should typically be managed in a widget locally
+// // change ProductsOverviewScreen to Stateful Widget
+// var showFavoritesOnly = false;
 
   List<Product> get items {
+    // if (showFavoritesOnly) {
+    //   return [..._items.where((element) => element.isFavorite)];
+    // }
     return [..._items];
+  }
+
+  // filtering logic isolated in provider
+  List<Product> get favoriteItems {
+    return [..._items.where((element) => element.isFavorite)];
   }
 
   Product getById(String id) {
