@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 
 class CartItem {
   final String id;
@@ -15,10 +16,28 @@ class CartItem {
 }
 
 class Cart with ChangeNotifier {
-  late Map<String, CartItem> _items;
+  Map<String, CartItem> _items = {};
 
-  Map<String, CardItem> get items {
+  Map<String, CartItem> get items {
     return {..._items};
+  }
+
+  double get totalAmount {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
+  }
+
+  int get totalQuantity {
+    List<int> quantities = _items.values.map((e) => e.quantity).toList();
+
+    return quantities.sum;
+  }
+
+  int get itemCount {
+    return _items.length;
   }
 
   void addItem(String productId, double price, String title) {
@@ -42,6 +61,7 @@ class Cart with ChangeNotifier {
           price: price,
         ),
       );
+      notifyListeners();
     }
   }
 }
