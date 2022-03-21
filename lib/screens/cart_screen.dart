@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/order.dart';
+import 'package:shop_app/screens/orders_screen.dart';
 
-import '../providers/cart.dart' show Cart;
-import '../widgets/cart_item.dart';
+import '../providers/cart.dart';
+import '../widgets/cart_item_tile.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -31,7 +33,7 @@ class CartScreen extends StatelessWidget {
                 const Spacer(),
                 Chip(
                   label: Text(
-                    '\$${cart.totalAmount}',
+                    '\$${cart.totalAmount.toStringAsFixed(2)}',
                     style: TextStyle(
                         color: Theme.of(context)
                             .primaryTextTheme
@@ -41,21 +43,32 @@ class CartScreen extends StatelessWidget {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // cart screen is not interested (aka. does not need to change) in
+                    // changes of our orders so set listen: false
+                    Provider.of<Order>(context, listen: false).addOrder(
+                      cart.items.values.toList(),
+                      cart.totalAmount,
+                    );
+                    //  cart screen needs to listen to cart changes to empty the following ListView of
+                    // cartItems
+                    cart.clear();
+                  },
                   child: const Text('ORDER NOW'),
                 ),
               ],
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Expanded(
           child: ListView.builder(
             itemCount: cart.itemCount,
-            itemBuilder: (ctx, i) => CartItem(
+            itemBuilder: (ctx, i) => CartItemTile(
               id: cart.items.values.toList()[i].id,
+              productId: cart.items.keys.toList()[i],
               title: cart.items.values.toList()[i].title,
               quantity: cart.items.values.toList()[i].quantity,
               price: cart.items.values.toList()[i].price,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/widgets/product_item.dart';
+import 'package:shop_app/widgets/product_item_grid_tile.dart';
 
 import '../providers/products_provider.dart';
 
@@ -31,7 +31,7 @@ class ProductsGrid extends StatelessWidget {
       itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
         // this is the nearest product provided to product initialized beneath
         value: loadedProducts[i],
-        child: const ProductItem(
+        child: const ProductItemGridTile(
             // loadedProducts[i].id,
             // loadedProducts[i].title,
             // loadedProducts[i].imageUrl,

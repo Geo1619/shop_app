@@ -4,8 +4,8 @@ import '../providers/cart.dart';
 import '../providers/product.dart';
 import '../screens/product_details_screen.dart';
 
-class ProductItem extends StatelessWidget {
-  const ProductItem({Key? key}) : super(key: key);
+class ProductItemGridTile extends StatelessWidget {
+  const ProductItemGridTile({Key? key}) : super(key: key);
 
   // const ProductItem(this.id, this.title, this.imageUrl, {Key? key})
   //     : super(key: key);
@@ -47,6 +47,17 @@ class ProductItem extends StatelessWidget {
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
               cart.addItem(product.id, product.price, product.title);
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Added Item to cart!'),
+                  duration: const Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () => cart.reduceItemQuantity(product.id),
+                  ),
+                ),
+              );
             },
             color: Theme.of(context).colorScheme.secondary,
           ),
