@@ -4,7 +4,7 @@ import 'package:shop_app/screens/edit_product_screen.dart';
 import 'package:shop_app/widgets/app_drawer.dart';
 import 'package:shop_app/widgets/product_item_list_tile.dart';
 
-import '../providers/products_provider.dart';
+import '../providers/product_data.dart';
 
 class UserProductsScreen extends StatelessWidget {
   const UserProductsScreen({Key? key}) : super(key: key);
@@ -12,7 +12,7 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<Products>(context);
+    final products = Provider.of<ProductData>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text('My Products'),
@@ -31,12 +31,13 @@ class UserProductsScreen extends StatelessWidget {
             itemBuilder: ((_, i) => Column(
                   children: [
                     ProductItemListTile(
-                        title: products.items[i].title,
-                        imageUrl: products.items[i].imageUrl),
+                        id: products.products[i].id,
+                        title: products.products[i].title,
+                        imageUrl: products.products[i].imageUrl),
                     const Divider(),
                   ],
                 )),
-            itemCount: products.items.length,
+            itemCount: products.products.length,
           ),
         ));
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'product.dart';
 
-class Products with ChangeNotifier {
-  final List<Product> _items = [
+class ProductData with ChangeNotifier {
+  final List<Product> _products = [
     Product(
       id: 'p1',
       title: 'Red Shirt',
@@ -42,24 +42,39 @@ class Products with ChangeNotifier {
 // // change ProductsOverviewScreen to Stateful Widget
 // var showFavoritesOnly = false;
 
-  List<Product> get items {
+  List<Product> get products {
     // if (showFavoritesOnly) {
     //   return [..._items.where((element) => element.isFavorite)];
     // }
-    return [..._items];
+    return [..._products];
   }
 
   // filtering logic isolated in provider
   List<Product> get favoriteItems {
-    return [..._items.where((element) => element.isFavorite)];
+    return [..._products.where((p) => p.isFavorite)];
   }
 
   Product getById(String id) {
-    return items.firstWhere((element) => element.id == id);
+    return products.firstWhere((p) => p.id == id);
   }
 
-  void addProduct() {
-    //_items.add(value);
+  void addProduct(Product product) {
+    product = product.copyWith(id: DateTime.now().toString());
+    _products.add(product);
+    // _items.insert(0, product); // at the start of the list
+    notifyListeners();
+  }
+
+  void editProduct(Product product) {
+    final productIndex = _products.indexWhere((p) => p.id == product.id);
+    if (productIndex >= 0) {
+      _products[productIndex] = product;
+      notifyListeners();
+    }
+  }
+
+  void deleteProduct(String id) {
+    _products.removeWhere((p) => p.id == id);
     notifyListeners();
   }
 }

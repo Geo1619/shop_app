@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop_app/screens/edit_product_screen.dart';
+import 'package:shop_app/screens/user_products_screen.dart';
+
+import '../providers/product_data.dart';
 
 class ProductItemListTile extends StatelessWidget {
   const ProductItemListTile(
-      {Key? key, required this.title, required this.imageUrl})
+      {Key? key, required this.title, required this.imageUrl, required this.id})
       : super(key: key);
+
+  final String id;
   final String title;
   final String imageUrl;
 
@@ -19,11 +26,41 @@ class ProductItemListTile extends StatelessWidget {
         child: Row(
           children: [
             IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushNamed(EditProductScreen.routeName, arguments: id);
+                },
                 icon: const Icon(Icons.edit),
                 color: Theme.of(context).colorScheme.primary),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                          title: const Text('Confirm action'),
+                          content: Text(
+                              'Are you sure you want to delete "${title}"'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(ctx).pop(false);
+                              },
+                              child: const Text('No'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(ctx).pop(true);
+                              },
+                              child: const Text('Yes'),
+                            ),
+                          ],
+                        )).then((value) {
+                  if (value) {
+                    Provider.of<ProductData>(context, listen: false)
+                        .deleteProduct(id);
+                  }
+                });
+              },
               icon: Icon(
                 Icons.delete,
                 color: Theme.of(context).colorScheme.error,

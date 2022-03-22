@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/products_provider.dart';
+import '../providers/product_data.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   static const routeName = '/product-details';
@@ -11,7 +11,7 @@ class ProductDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final productId = ModalRoute.of(context)!.settings.arguments as String;
     // don't want to update if another product gets added
-    var loadedProduct = Provider.of<Products>(
+    var loadedProduct = Provider.of<ProductData>(
       context,
       listen: false,
     ).getById(productId);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/widgets/product_item_grid_tile.dart';
 
-import '../providers/products_provider.dart';
+import '../providers/product_data.dart';
 
 class ProductsGrid extends StatelessWidget {
   const ProductsGrid(
@@ -15,9 +15,9 @@ class ProductsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Want to update every time a product gets added
-    final productsData = Provider.of<Products>(context);
+    final productsData = Provider.of<ProductData>(context);
     final loadedProducts =
-        showFavorites ? productsData.favoriteItems : productsData.items;
+        showFavorites ? productsData.favoriteItems : productsData.products;
 
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
