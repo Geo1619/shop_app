@@ -4,12 +4,13 @@ import 'package:shop_app/screens/cart_screen.dart';
 import 'package:shop_app/widgets/app_drawer.dart';
 
 import '../providers/cart.dart';
+import '../providers/product_data.dart';
 import '../widgets/badge.dart';
 import '../widgets/products_grid.dart';
 
 enum FilterOptions {
-  Favorites,
-  All,
+  favorites,
+  all,
 }
 
 // Grid of products
@@ -24,6 +25,27 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
 // this is widget filter approach.
 // filter logic should typically be managed in a widget locally
   var _showOnlyFavorites = false;
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void initState() {
+    // Provider.of<ProductData>(context).fetchAndSetProducts(); //Won't work. Will work only  if listen: false;
+    super.initState();
+  }
+
+// this approach needs _isInit to run only once (in init)
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      _isLoading = true;
+      Provider.of<ProductData>(context).fetchAndSetProducts().then((_) {
+        _isLoading = false;
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
 // Screen (or page or route) widgets should return a Scaffold widget to provide a full UI layout
   @override
@@ -36,7 +58,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
             onSelected: (FilterOptions selectedValue) {
               // don't forget setState when changing displaying data to a stateful widget
               setState(() {
-                if (selectedValue == FilterOptions.Favorites) {
+                if (selectedValue == FilterOptions.favorites) {
                   _showOnlyFavorites = true;
                 } else {
                   _showOnlyFavorites = false;
@@ -46,11 +68,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
             itemBuilder: (_) => [
               const PopupMenuItem(
                 child: Text('Only Favorites'),
-                value: FilterOptions.Favorites,
+                value: FilterOptions.favorites,
               ),
               const PopupMenuItem(
                 child: Text('Show All'),
-                value: FilterOptions.All,
+                value: FilterOptions.all,
               ),
             ],
             icon: const Icon(
@@ -76,7 +98,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: const AppDrawer(),
-      body: ProductsGrid(_showOnlyFavorites),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavorites),
     );
   }
 }
