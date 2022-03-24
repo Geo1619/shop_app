@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/order.dart';
+import 'package:shop_app/providers/order_data.dart';
 import 'package:shop_app/screens/orders_screen.dart';
 
 import '../providers/cart.dart';
@@ -42,20 +42,7 @@ class CartScreen extends StatelessWidget {
                   ),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
-                TextButton(
-                  onPressed: () {
-                    // cart screen is not interested (aka. does not need to change) in
-                    // changes of our orders so set listen: false
-                    Provider.of<Order>(context, listen: false).addOrder(
-                      cart.items.values.toList(),
-                      cart.totalAmount,
-                    );
-                    //  cart screen needs to listen to cart changes to empty the following ListView of
-                    // cartItems
-                    cart.clear();
-                  },
-                  child: const Text('ORDER NOW'),
-                ),
+                OrderButton(cart: cart),
               ],
             ),
           ),
@@ -76,6 +63,53 @@ class CartScreen extends StatelessWidget {
           ),
         )
       ]),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key? key,
+    required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: widget.cart.totalAmount <= 0
+          ? null
+          : () async {
+              setState(() {
+                _isLoading = true;
+              });
+              // cart screen is not interested (aka. does not need to change) in
+              // changes of our orders so set listen: false
+              await Provider.of<OrderData>(context, listen: false).addOrder(
+                widget.cart.items.values.toList(),
+                widget.cart.totalAmount,
+              );
+              setState(() {
+                _isLoading = false;
+              });
+              //  cart screen needs to listen to cart changes to empty the following ListView of
+              // cartItems
+              widget.cart.clear();
+            },
+      child: _isLoading
+          ? const SizedBox(
+              width: 80,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          : const Text('ORDER NOW'),
     );
   }
 }

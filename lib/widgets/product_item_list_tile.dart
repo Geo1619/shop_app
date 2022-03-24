@@ -16,6 +16,7 @@ class ProductItemListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     return ListTile(
       title: Text(title),
       leading: CircleAvatar(
@@ -33,8 +34,8 @@ class ProductItemListTile extends StatelessWidget {
                 icon: const Icon(Icons.edit),
                 color: Theme.of(context).colorScheme.primary),
             IconButton(
-              onPressed: () {
-                showDialog(
+              onPressed: () async {
+                final shouldDelete = await showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
                           title: const Text('Confirm action'),
@@ -54,12 +55,24 @@ class ProductItemListTile extends StatelessWidget {
                               child: const Text('Yes'),
                             ),
                           ],
-                        )).then((value) {
-                  if (value) {
-                    Provider.of<ProductData>(context, listen: false)
+                        ));
+                if (shouldDelete) {
+                  try {
+                    await Provider.of<ProductData>(context, listen: false)
                         .deleteProduct(id);
+                    scaffoldMessenger.showSnackBar(
+                        SnackBar(content: Text('"$title" deleted!')));
+                  } catch (e) {
+                    // using .of(context) directly inside a Future causes
+                    // Unhandled Exception: Looking up a deactivated widget's ancestor is unsafe.
+                    // store it in variable inside the build method
+
+                    // ScaffoldMessenger.of(context)
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(content: Text(e.toString())),
+                    );
                   }
-                });
+                }
               },
               icon: Icon(
                 Icons.delete,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/http_exception.dart';
 import 'product.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -66,9 +67,8 @@ class ProductData with ChangeNotifier {
         '/products.json');
     try {
       final response = await http.get(_url);
-      print(json.decode(response.body));
-
-      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final extractedData = json.decode(response.body) as Map<String, dynamic>?;
+      if (extractedData == null) return;
       List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -89,11 +89,11 @@ class ProductData with ChangeNotifier {
 
   // We return a future so that edit product screen waits for this method
   Future<void> addProduct(Product product) async {
-    final _url = Uri.https(
+    final url = Uri.https(
         'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
         '/products.json');
     try {
-      final response = await http.post(_url,
+      final response = await http.post(url,
           body: json.encode({
             'title': product.title,
             'description': product.description,
@@ -116,16 +116,69 @@ class ProductData with ChangeNotifier {
     }
   }
 
-  void editProduct(Product product) {
+  Future<void> updateProduct(Product product) async {
     final productIndex = _products.indexWhere((p) => p.id == product.id);
     if (productIndex >= 0) {
+      final url = Uri.https(
+          'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
+          '/products/${product.id}.json');
+      // patch will override only the sent data in db leaving the rest of the record intact.
+      http.patch(url,
+          body: json.encode({
+            'title': product.title,
+            'description': product.description,
+            'imageUrl': product.imageUrl,
+            'price': product.price,
+          }));
       _products[productIndex] = product;
       notifyListeners();
     }
   }
 
-  void deleteProduct(String id) {
-    _products.removeWhere((p) => p.id == id);
+  // optimistic updating (rollback deletion if request fails)
+  Future<void> deleteProduct(String id) async {
+    final url = Uri.https(
+        'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
+        '/products/$id.json');
+    final existingProductIndex = _products.indexWhere((p) => p.id == id);
+    var existingProduct = _products[existingProductIndex];
+
+    _products.removeAt(existingProductIndex);
     notifyListeners();
+    final res = await http.delete(url);
+
+    if (res.statusCode >= 400) {
+      _products.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('Could not delete product.');
+    }
+  }
+
+  Future<void> toggleFavoriteStatus(String id) async {
+    final productIndex = _products.indexWhere((p) => p.id == id);
+    var existingProduct = _products[productIndex];
+    var patchValue = !_products[productIndex].isFavorite;
+    if (productIndex >= 0) {
+      _products[productIndex] =
+          _products[productIndex].copyWith(isFavorite: patchValue);
+      notifyListeners();
+      final url = Uri.https(
+          'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
+          '/products/$id.json');
+      // patch will override only the sent data in db leaving the rest of the record intact.
+      try {
+        final res = await http.patch(url,
+            body: json.encode({
+              'isFavorite': patchValue,
+            }));
+        if (res.statusCode >= 400) {
+          _products[productIndex] = existingProduct;
+          notifyListeners();
+          throw HttpException('Something went wrong on our side.');
+        }
+      } catch (e) {
+        rethrow;
+      }
+    }
   }
 }

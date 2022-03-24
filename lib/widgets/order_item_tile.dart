@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../providers/order.dart';
+import '../providers/order_data.dart';
 
 class OrderItemTile extends StatefulWidget {
   const OrderItemTile({Key? key, required this.orderItem}) : super(key: key);
 
-  final OrderItem orderItem;
+  final Order orderItem;
 
   @override
   State<OrderItemTile> createState() => _OrderItemTileState();
@@ -39,7 +40,7 @@ class _OrderItemTileState extends State<OrderItemTile> {
           ),
           if (_expanded)
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
               height:
                   min(widget.orderItem.products.length * 20.0 + 20.0, 120.0),
               child: ListView(
