@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../providers/order.dart';
-import '../providers/order_data.dart';
 
 class OrderItemTile extends StatefulWidget {
   const OrderItemTile({Key? key, required this.orderItem}) : super(key: key);

@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -131,7 +129,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       ),
       body: _isLoading
           ? const Center(
-              child: const CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             )
           : Padding(
               padding: const EdgeInsets.all(16.0),

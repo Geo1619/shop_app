@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -23,7 +25,9 @@ class OrderData with ChangeNotifier {
 
       final extractedData = json.decode(response.body) as Map<String, dynamic>?;
       List<Order> loadedOrders = [];
-      if (extractedData == null || extractedData.isEmpty) return;
+
+      if (extractedData == null) return;
+
       extractedData.forEach((orderId, orderData) {
         loadedOrders.add(Order(
           id: orderId,
@@ -51,13 +55,13 @@ class OrderData with ChangeNotifier {
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url = Uri.https(
       'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
-      'orders.json',
+      '/orders.json',
     );
     final timeStamp = DateTime.now();
     try {
       var response = await http.post(url,
           body: jsonEncode({
-            'total': total,
+            'amount': total,
             'dateTime': timeStamp.toIso8601String(),
             'products': cartProducts
                 .map((cp) => {

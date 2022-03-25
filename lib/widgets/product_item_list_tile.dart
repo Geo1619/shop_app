@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/screens/edit_product_screen.dart';
-import 'package:shop_app/screens/user_products_screen.dart';
 
 import '../providers/product_data.dart';
 
@@ -39,8 +38,8 @@ class ProductItemListTile extends StatelessWidget {
                     context: context,
                     builder: (ctx) => AlertDialog(
                           title: const Text('Confirm action'),
-                          content: Text(
-                              'Are you sure you want to delete "${title}"'),
+                          content:
+                              Text('Are you sure you want to delete "$title"'),
                           actions: [
                             TextButton(
                               onPressed: () {

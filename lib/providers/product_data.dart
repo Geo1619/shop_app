@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import '../models/http_exception.dart';
 import 'product.dart';
@@ -79,7 +81,7 @@ class ProductData with ChangeNotifier {
           imageUrl: prodData['imageUrl'],
           isFavorite: prodData['isFavorite'],
         ));
-        _products = loadedProducts;
+        _products = loadedProducts.reversed.toList();
         notifyListeners();
       });
     } catch (e) {
