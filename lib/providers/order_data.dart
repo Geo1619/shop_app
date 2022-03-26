@@ -9,7 +9,10 @@ import '../providers/cart.dart';
 import 'order.dart';
 
 class OrderData with ChangeNotifier {
+  OrderData(this.authToken, this.authUserId, this._orders);
   List<Order> _orders = [];
+  String? authToken;
+  String? authUserId;
 
   List<Order> get orders {
     return [..._orders];
@@ -17,8 +20,10 @@ class OrderData with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     final _url = Uri.https(
-        'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
-        '/orders.json');
+      'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
+      '/orders/$authUserId.json',
+      {'auth': authToken},
+    );
     try {
       final response = await http.get(_url);
       print(json.decode(response.body));
@@ -55,7 +60,8 @@ class OrderData with ChangeNotifier {
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url = Uri.https(
       'flutter-shop-app-335dd-default-rtdb.europe-west1.firebasedatabase.app',
-      '/orders.json',
+      '/orders/$authUserId.json',
+      {'auth': authToken},
     );
     final timeStamp = DateTime.now();
     try {
