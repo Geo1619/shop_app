@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/helpers/custom_route.dart';
 import 'package:shop_app/providers/auth.dart';
 import 'package:shop_app/screens/auth_screen.dart';
 import 'package:shop_app/screens/splash_screen.dart';
@@ -49,12 +50,16 @@ class MyApp extends StatelessWidget {
         builder: (context, auth, _) => MaterialApp(
           title: 'MyShop',
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.purple,
-              secondary: Colors.deepOrange,
-            ),
-            fontFamily: 'Lato',
-          ),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.purple,
+                secondary: Colors.deepOrange,
+              ),
+              fontFamily: 'Lato',
+              // Change animation of pages when navigating
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                TargetPlatform.android: CustomPageTransitionsBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionsBuilder(),
+              })),
           home: auth.isAuth
               ? const ProductsOverviewScreen()
               : FutureBuilder(
